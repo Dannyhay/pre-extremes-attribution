@@ -67,20 +67,20 @@ axs[0].plot(y, r["J_src"], color=C[1], label=r"$J_{\rm src}$")
 axs[0].plot(y, r["J_self"], color=C[0], label=r"$J_{\rm self}$")
 axs[0].plot(y, r["J_diff"], color=C[2], label=r"$J_{\rm diff}$")
 axs[0].plot(y, tot, color=INK, lw=1.6, label="total")
-axs[0].set_xlim(21, 31); axs[0].set_xlabel("$y$ (target)"); axs[0].set_ylabel("current")
+axs[0].set_xlim(21, 31); axs[0].set_xlabel("$y$ (target, °C)"); axs[0].set_ylabel("current (d$^{-1}$)")
 lo, hi = axs[0].get_ylim(); axs[0].set_ylim(lo, hi + 0.35 * (hi - lo))
 axs[0].legend(loc="upper left", ncol=4, handlelength=1.2, columnspacing=0.8)
 for n in names:
     rr = st[n]
     axs[1].plot(rr["y"], rr["J_exc"], color=col[n], label=n)
-axs[1].set_xlim(18, 36); axs[1].set_xlabel("$y$"); axs[1].set_ylabel(r"$J_{\rm exc}$")
+axs[1].set_xlim(18, 36); axs[1].set_xlabel("$y$ (°C)"); axs[1].set_ylabel(r"$J_{\rm exc}$ (d$^{-1}$)")
 axs[1].legend(loc="lower right")
 t = np.array(tr["t"]); rec = tr["records"]["29.0"]
 P = np.array(rec["P"]); J = np.array(rec["total"])
 dPdt = np.gradient(P, t)
 axs[2].plot(t, J, color=C[1], label="$J(u,t)$")
 axs[2].plot(t[::40], dPdt[::40], "o", color=INK, ms=2.5, label="$dP_u/dt$")
-axs[2].set_xlabel("time (d)"); axs[2].set_ylabel("rate"); axs[2].legend(loc="upper left")
+axs[2].set_xlabel("time (d)"); axs[2].set_ylabel("rate (d$^{-1}$)"); axs[2].legend(loc="upper left")
 for a, l in zip(axs, "abc"):
     tidy(a); label(a, f"({l})")
 fig.savefig("fig2_decomposition.pdf", bbox_inches="tight")

@@ -1,7 +1,8 @@
 # Attributing extreme-event probability to a source variable — code
 
 Code accompanying D. Hagan, *Attributing extreme-event probability to a source
-variable* (submitted to Physical Review E).
+variable* (submitted to Physical Review E). The version used for the submitted
+manuscript is tagged `v1.0`.
 
 Author: Daniel Hagan, Hydro-Climate Extremes Lab (H-CEL), Ghent University.
 
@@ -9,17 +10,18 @@ Author: Daniel Hagan, Hydro-Climate Extremes Lab (H-CEL), Ghent University.
 
 | Folder | Reproduces | Main scripts |
 |---|---|---|
-| `testbed/` | Secs. II D, III, IV B, V C and VI: Liang flow and bridge identity, stationary currents, exceedance-flux identity, non-attribution of the flux decomposition, adjoint accuracy, operating envelope (Figs. 1, 2, 4, 5, 6; Table I) | `stationary_regimes.py`, `traversal.py`, `adjoint_accuracy.py`, `envelope.py`, `make_figs.py` (details in `testbed/README.md`) |
-| `repairs/` | Sec. II E and Appendix B: Rényi escort flow in the testbed, Smirnov's finite-time information response, Auconi's Fisher-normalised response, and the binned Rényi estimator with circular-shift surrogates (Fig. 3) | `testbed_escort.py`, `ftir_linear.py`, `ftir_testbed.py`, `auconi.py`, `stress.py` (part iii), `make_escort_figs.py`, `make_ftir_fig.py` |
+| `testbed/` | Secs. II D, III, IV B, V C and VI: Liang flow and bridge identity, stationary currents, exceedance-flux identity, non-attribution of the flux decomposition, adjoint accuracy, operating envelope, residual and sampling-step diagnostics, the saturated regime and the choice of reference (Figs. 1, 2, 4, 5, 6; Tables I and II) | `stationary_regimes.py`, `traversal.py`, `adjoint_accuracy.py`, `envelope.py`, `diagnostics.py`, `saturation.py`, `make_figs.py` (details in `testbed/README.md`) |
+| `repairs/` | Sec. II E and Appendix C: Rényi analogue of the Liang flow in the testbed, Smirnov's finite-time information response, Auconi's Fisher-normalised response, and the binned lagged Rényi transfer entropy with circular-shift surrogates (Fig. 3) | `testbed_escort.py`, `ftir_linear.py`, `ftir_testbed.py`, `auconi.py`, `stress.py` (part iii), `make_escort_figs.py`, `make_ftir_fig.py` |
 | `data/` | The hourly site series used in Sec. VII A (ERA5-Land 2-m temperature and 0–100 cm soil moisture; ERA5 Z500 and T850) at 48.8°N 2.0°E and 51.7°N 39.2°E, JJA 1979–2022 | `download_era5_sites_arco_v2.py` writes `site.csv` (2003) and `site_2010.csv` (2010) |
-| `application/` | The attribution of the 2003 and 2010 heatwaves: fitted generator, adjoint attribution, direct counterfactual, threshold sweep (Sec. VII A) | `attribute_event.py`, `sweep.py`; outputs in `results/` |
-| `figures/` | Fig. 7 (reads `application/results/sweep_all.json`, `data/site*.csv` and the testbed band from `testbed/adjoint.json`; run from `figures/`) | `make_fig7_application.py` |
+| `application/` | The attribution of the 2003 and 2010 heatwaves: fitted generator with diurnal modulation and residual autocorrelation, first-order adjoint, direct counterfactual, extrapolation sensitivity, year-block bootstrap, leave-one-year-out hindcasts (Sec. VII A) | `model.py`, `attribute_event.py`, `bootstrap.py`, `hindcast.py`, `run_all.sh`; outputs in `results/` |
+| `figures/` | Fig. 7 (reads `application/results/*.json` and `data/site*.csv`; run from `figures/`) | `make_fig7_application.py` |
 
 ## Reproducing the testbed
 
 ```bash
 cd testbed
 python stationary_regimes.py && python traversal.py && python adjoint_accuracy.py && python envelope.py
+python diagnostics.py && python saturation.py
 python make_figs.py
 ```
 
@@ -29,8 +31,14 @@ python make_figs.py
 pip install -r requirements.txt
 cd data && python download_era5_sites_arco_v2.py --site all --start 1979-01-01 --end 2022-12-31
 cp site.csv site_2010.csv ../application/ && cd ../application
-python sweep.py            # writes sweep_*.json and sweep_all.json
+sh run_all.sh              # writes results/*.json, then figures/fig7_application.pdf
 ```
+
+The fit uses only increments between consecutive hours of the same summer. The
+model is integrated on the hourly step on which it was fitted, and the adjoint uses
+the same discrete kernel, so it is the exact first derivative of the simulated
+model. Every numerical output behind Fig. 7 and the numbers quoted in Sec. VII A is
+in `application/results/`.
 
 ERA5 and ERA5-Land are distributed by the Copernicus Climate Change Service
 under the Copernicus licence; the site series are not redistributed here and
